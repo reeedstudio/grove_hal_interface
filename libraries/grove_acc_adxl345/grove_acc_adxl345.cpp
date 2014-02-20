@@ -1,7 +1,6 @@
+#include <Arduino.h>
 #include <math.h>
 #include <Wire.h>
-#include <seeed_grove_hal.h>
-
 
 #include "grove_acc_adxl345.h"
 
@@ -17,18 +16,18 @@ int8 recv_len = 0;
 
 
 // Writes val to address register on device
-void writeTo(int8 address, int8 val) 
+void writeTo(unsigned char address, unsigned char val) 
 {
     grove_hal_i2c_write_one(ADXL345_DEVICE, address, val);
 }
 
 // Reads num bytes starting from address register on device in to _buff array
-void readFrom(int8 address, int16 num, uint8 _buff[]) 
+void readFrom(unsigned char address, int num, unsigned char buff[]) 
 {
-    grove_hal_i2c_read(ADXL345_DEVICE, address, _buff, num);
+    grove_hal_i2c_read(ADXL345_DEVICE, address, buff, num);
 }
 
-void setRegisterBit(int8 regAdress, int16 bitPos, bool state) 
+void setRegisterBit(unsigned char regAdress, unsigned char bitPos, unsigned char state) 
 {
     uint8 _b;
     
@@ -42,6 +41,13 @@ void setRegisterBit(int8 regAdress, int16 bitPos, bool state)
     }
     
     writeTo(regAdress, _b);
+}
+
+unsigned char getRegisterBit(unsigned char regAdress, int bitPos) 
+{
+    uint8 _b;
+    readFrom(regAdress, 1, &_b);
+    return ((_b >> bitPos) & 1);
 }
 
 // initialize sensor
@@ -109,8 +115,8 @@ void acc_adxl345_init()
 // get accleration, save to xyz
 void getAcceleration(double *xyz)
 {
-    int16 i;
-    int16 xyz_int[3];
+    int i;
+    int xyz_int[3];
 
     acc_adxl345_read_xyz(&xyz_int[0], &xyz_int[1], &xyz_int[2]);
     for(i=0; i<3; i++)
@@ -120,30 +126,23 @@ void getAcceleration(double *xyz)
 }
 
 
-bool getRegisterBit(int8 regAdress, int16 bitPos) 
-{
-    uint8 _b;
-    readFrom(regAdress, 1, &_b);
-    return ((_b >> bitPos) & 1);
-}
-
-void acc_adxl345_read_xyz(int16 *x, int16 *y, int16 *z)
+void acc_adxl345_read_xyz(int *x, int *y, int *z)
 {
     uint8 _buff[6];
     readFrom(ADXL345_DATAX0, ADXL345_TO_READ, _buff); //read the acceleration data from the ADXL345
 
     // each axis reading comes in 10 bit resolution, ie 2 bytes.  Least Significat Byte first!!
-    // thus we are converting both bytes in to one int16
-    *x = (((int16)_buff[1]) << 8) | _buff[0];
-    *y = (((int16)_buff[3]) << 8) | _buff[2];
-    *z = (((int16)_buff[5]) << 8) | _buff[4];
+    // thus we are converting both bytes in to one int
+    *x = (((int)_buff[1]) << 8) | _buff[0];
+    *y = (((int)_buff[3]) << 8) | _buff[2];
+    *z = (((int)_buff[5]) << 8) | _buff[4];
 }
 
 // read acceleration , save to x, y, z
 void acc_adxl345_read_acc(float *ax, float *ay, float *az)
 {
 
-    int16 xyz[3];
+    int xyz[3];
     acc_adxl345_read_xyz(&xyz[0], &xyz[1], &xyz[2]);
 
     *ax = xyz[0] * __Gains[0];
