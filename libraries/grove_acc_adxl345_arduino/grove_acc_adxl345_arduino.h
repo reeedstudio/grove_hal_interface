@@ -14,18 +14,16 @@ public:
     void begin()
     {
         acc_adxl345_init();
-        
-       // Serial.println(ADXL345_INT1_PIN);
     }
     
     void getAcc(float *ax, float *ay, float *az)
     {
-        //acc_adxl345_read_acc(ax, ay, az);
+        acc_adxl345_read_acc(ax, ay, az);
     }
     
     void getAcc(double *xyz)
     {
-        //getAcceleration(xyz);
+        getAcceleration(xyz);
     }
 
 };

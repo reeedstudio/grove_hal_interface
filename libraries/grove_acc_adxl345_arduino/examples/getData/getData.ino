@@ -4,6 +4,7 @@
 
 #include <grove_acc_adxl345_arduino.h>
 #include <grove_acc_adxl345.h>
+#include <seeed_grove_hal.h>
 
 ACC_ADXL345 acc;
 

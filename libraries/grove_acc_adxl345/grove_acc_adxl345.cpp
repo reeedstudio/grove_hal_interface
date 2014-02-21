@@ -2,17 +2,18 @@
 #include <math.h>
 #include <Wire.h>
 
+#include <Arduino.h>
+#include <seeed_grove_hal.h>
+
 #include "grove_acc_adxl345.h"
 
 
-#define ADXL345_DEVICE (0x53)    // ADXL345 device address
-#define ADXL345_TO_READ (6)      // num of bytes we are going to read each time (two bytes for each axis)
+#define ADXL345_DEVICE (0x53)                   // ADXL345 device address
+#define ADXL345_TO_READ (6)                     // num of bytes we are going to read each time (two bytes for each axis)
 
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
 const double __Gains[3] = {0.00376390, 0.00376009, 0.00349265};
-
-int8 recv_len = 0;
 
 
 // Writes val to address register on device
@@ -33,10 +34,12 @@ void setRegisterBit(unsigned char regAdress, unsigned char bitPos, unsigned char
     
     readFrom(regAdress, 1, &_b);
     
-    if (state) {
+    if (state) 
+    {
         _b |= (1 << bitPos);                        // forces nth bit of _b to be 1.  all other bits left alone.
     }
-    else {
+    else 
+    {
         _b &= ~(1 << bitPos);                       // forces nth bit of _b to be 0.  all other bits left alone.
     }
     
